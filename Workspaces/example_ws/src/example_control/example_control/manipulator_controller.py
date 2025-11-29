@@ -5,7 +5,7 @@ from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Twist, PointStamped
 from .kinematics import RobotKinematics
-
+from .dynamics import RobotDynamics
 class ManipulatorController(Node):
   def __init__(self):
     super().__init__("manipulator_controller")
@@ -13,6 +13,9 @@ class ManipulatorController(Node):
     self.robot_kinematics = RobotKinematics()
     self.robot_kinematics.redirect_print(self.get_logger().info)
     self.robot_kinematics.direct_kinematics()
+    self.robot_dynamics = RobotDynamics()
+    self.robot_dynamics.define_kinematics(self.robot_kinematics)
+    self.robot_dynamics.define_dynamics()
     # Variable de control para definir si hay una trayectoria activa
     self.moving = False
     # Perfil de calidad de información
@@ -27,7 +30,7 @@ class ManipulatorController(Node):
     self.clicked_point_subscriber = self.create_subscription(
       PointStamped, "/clicked_point", self.clicked_point_callback, 10
     )
-    # Recibr información de posición actual de las juntas
+    # Recibir información de posición actual de las juntas
     self.joint_states_subscriber = self.create_subscription(
       JointState, "/joint_states", self.joint_states_callback, 10
     )
@@ -68,6 +71,12 @@ class ManipulatorController(Node):
                                                [msg.point.x, msg.point.z, 0.0], 3)
     # Implementar modelo de cinemática inversa
     self.robot_kinematics.inverse_kinematics()
+    #Implementar dinámica
+    self.robot_dynamics.lagrange_effort_generator()
+    # Imprimir gráficas
+    self.robot_kinematics.ws_graph()
+    self.robot_kinematics.q_graph()
+    self.robot_dynamics.effort_graph()
     # Implementar timer para publicar periódicamente la posición de las juntas
     self.count = 0
     self.joint_goals =  JointState()
