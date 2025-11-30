@@ -1,0 +1,85 @@
+<robot name="robot2_rrr"> 
+  <!--Definición de eslabones--> 
+  
+  <!-- Base fija -->
+  <link name = "base_link_r2">
+    <visual>
+      <origin xyz = "0 0 0.025" rpy = "0 0 0"/> 
+      <geometry> 
+        <cylinder length="0.05" radius="0.08"/> 
+      </geometry> 
+      <material name = "DarkGray"> 
+        <color rgba = "0.3 0.3 0.3 1.0"/> 
+      </material> 
+    </visual> 
+  </link> 
+ 
+  <!-- Eslabón 0: Base rotatoria (5cm altura) -->
+  <link name = "turret_link_r2"> 
+    <visual> 
+      <origin xyz = "0 0 0.025" rpy = "0 0 0"/> 
+      <geometry> 
+        <box size = "0.06 0.06 0.05"/> 
+      </geometry> 
+      <material name = "Orange"> 
+        <color rgba = "1 0.5 0 1.0"/> 
+      </material> 
+    </visual> 
+  </link> 
+
+  <!-- Eslabón 1: Primer eslabón RR (20cm) -->
+  <link name = "shoulder_link_r2"> 
+    <visual> 
+      <origin xyz = "0.1 0 0" rpy = "0 0 0"/> 
+      <geometry> 
+        <box size = "0.2 0.03 0.03"/> 
+      </geometry> 
+      <material name = "Cyan"> 
+        <color rgba = "0 1 1 1.0"/> 
+      </material> 
+    </visual> 
+  </link> 
+
+  <!-- Eslabón 2: Segundo eslabón RR (35cm) -->
+  <link name = "arm_link_r2"> 
+    <visual> 
+      <origin xyz = "0.175 0 0" rpy = "0 0 0"/> 
+      <geometry> 
+        <box size = "0.35 0.03 0.03"/> 
+      </geometry> 
+      <material name = "Magenta"> 
+        <color rgba = "1 0 1 1.0"/> 
+      </material> 
+    </visual> 
+  </link>
+ 
+  <!--Definición de juntas--> 
+  
+  <!-- Junta 0: Rotación de base en Z (theta_0_1) -->
+  <joint name = "turret_joint_r2" type = "revolute"> 
+    <parent link = "base_link_r2"/> 
+    <child link = "turret_link_r2"/> 
+    <origin xyz = "0 0 0.05" rpy = "0 0 0"/> 
+    <axis xyz = "0 0 1"/> 
+    <limit effort="10.0" lower="-3.14" upper="3.14" velocity="3.14"/>
+  </joint>
+
+  <!-- Junta 1: Primer eslabón RR (theta_1_2) - rotación en Z después de girar 90° en X -->
+  <joint name = "shoulder_joint_r2" type = "revolute"> 
+    <parent link = "turret_link_r2"/> 
+    <child link = "shoulder_link_r2"/> 
+    <origin xyz = "0 0 0.05" rpy = "1.57 0 0"/> 
+    <axis xyz = "0 0 1"/> 
+    <limit effort="10.0" lower="-3.14" upper="3.14" velocity="3.14"/>
+  </joint>
+
+  <!-- Junta 2: Segundo eslabón RR (theta_2_3) - rotación en Z local -->
+  <joint name = "arm_joint_r2" type = "revolute"> 
+    <parent link = "shoulder_link_r2"/> 
+    <child link = "arm_link_r2"/> 
+    <origin xyz = "0.2 0 0" rpy = "0 0 0"/> 
+    <axis xyz = "0 0 1"/> 
+    <limit effort="10.0" lower="-3.14" upper="3.14" velocity="3.14"/>
+  </joint>
+ 
+</robot>
